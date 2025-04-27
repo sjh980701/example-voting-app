@@ -37,5 +37,5 @@ jobs:
           
           docker run -d --name result --network app-network -p 5001:80 sjh980701/examplevotingapp_result:latest
           docker run -d --name worker --network app-network sjh980701/examplevotingapp_worker:latest
-          docker run -d --name vote --network app-network -p 80:80 sjh980701/examplevotingapp_vote:latest
+          docker run -d --name vote --network app-network -p 31234:80 sjh980701/examplevotingapp_vote:latest
 
