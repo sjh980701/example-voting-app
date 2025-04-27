@@ -1,0 +1,17 @@
+name: Build All Services
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-result:
+    uses: ./.github/workflows/call-docker-build-result.yaml
+
+  build-worker:
+    uses: ./.github/workflows/call-docker-build-worker.yaml
+
+  build-vote:
+    uses: ./.github/workflows/call-docker-build-vote.yaml
+
