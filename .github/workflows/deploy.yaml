@@ -28,7 +28,7 @@ jobs:
           docker stop worker || true && docker rm worker || true
           docker stop vote || true && docker rm vote || true
 
-          docker run -d --name result sjh980701/examplevotingapp_result:latest
+          docker run -d --name result -p 5001:80 sjh980701/examplevotingapp_result:latest
           docker run -d --name worker sjh980701/examplevotingapp_worker:latest
-          docker run -d --name vote sjh980701/examplevotingapp_vote:latest
+          docker run -d --name vote -p 31234:80 sjh980701/examplevotingapp_vote:latest
 
