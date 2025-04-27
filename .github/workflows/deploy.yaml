@@ -1,0 +1,34 @@
+name: Deploy to Server
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Connect to server and deploy
+      uses: appleboy/ssh-action@v0.1.6
+      with:
+        host: ${{ secrets.REMOTE_HOST }}
+        username: ${{ secrets.REMOTE_USER }}
+        key: ${{ secrets.REMOTE_SSH_KEY }}
+        script: |
+          docker pull sjh980701/examplevotingapp_result:latest
+          docker pull sjh980701/examplevotingapp_worker:latest
+          docker pull sjh980701/examplevotingapp_vote:latest
+          
+          docker stop result || true && docker rm result || true
+          docker stop worker || true && docker rm worker || true
+          docker stop vote || true && docker rm vote || true
+
+          docker run -d --name result sjh980701/examplevotingapp_result:latest
+          docker run -d --name worker sjh980701/examplevotingapp_worker:latest
+          docker run -d --name vote sjh980701/examplevotingapp_vote:latest
+
