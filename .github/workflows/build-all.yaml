@@ -1,4 +1,4 @@
-name: Build All Services
+name: Build and Push All Services
 
 on:
   push:
@@ -7,11 +7,35 @@ on:
 
 jobs:
   build-result:
-    uses: ./.github/workflows/call-docker-build-result.yaml
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Build and Push result image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./result
+          push: true
+          tags: sjh980701/examplevotingapp_result:latest
 
   build-worker:
-    uses: ./.github/workflows/call-docker-build-worker.yaml
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Build and Push worker image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./worker
+          push: true
+          tags: sjh980701/examplevotingapp_worker:latest
 
   build-vote:
-    uses: ./.github/workflows/call-docker-build-vote.yaml
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Build and Push vote image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./vote
+          push: true
+          tags: sjh980701/examplevotingapp_vote:latest
 
