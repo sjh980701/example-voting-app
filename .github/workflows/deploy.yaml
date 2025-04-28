@@ -1,4 +1,4 @@
-name: Deploy to Server
+name: Deploy to Kubernetes
 
 on:
   push:
@@ -13,29 +13,17 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v3
 
-    - name: Connect to server and deploy
-      uses: appleboy/ssh-action@v0.1.6
+    - name: Set up kubectl
+      uses: azure/setup-kubectl@v3
       with:
-        host: ${{ secrets.REMOTE_HOST }}
-        username: ${{ secrets.REMOTE_USER }}
-        key: ${{ secrets.REMOTE_SSH_KEY }}
-        script: |
-          docker pull sjh980701/examplevotingapp_result:latest
-          docker pull sjh980701/examplevotingapp_worker:latest
-          docker pull sjh980701/examplevotingapp_vote:latest
-          
-          docker stop result || true && docker rm result || true
-          docker stop worker || true && docker rm worker || true
-          docker stop vote || true && docker rm vote || true
-          docker stop redis || true && docker rm redis || true
-          docker stop db || true && docker rm db || true
+        version: 'latest'
 
-          docker network create app-network || true
+    - name: Set kubeconfig
+      run: |
+        mkdir -p ~/.kube
+        echo "${{ secrets.KUBECONFIG }}" > ~/.kube/config
 
-          docker run -d --name redis --network app-network redis
-          docker run -d --name db --network app-network -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=postgres postgres:15-alpine
-          
-          docker run -d --name result --network app-network -p 5001:80 sjh980701/examplevotingapp_result:latest
-          docker run -d --name worker --network app-network sjh980701/examplevotingapp_worker:latest
-          docker run -d --name vote --network app-network -p 31234:80 sjh980701/examplevotingapp_vote:latest
+    - name: Deploy to Kubernetes
+      run: |
+        kubectl apply -f k8s-specifications/vote-deployment.yaml
 
