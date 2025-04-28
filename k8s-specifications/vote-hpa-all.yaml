@@ -1,0 +1,48 @@
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: vote-hpa
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: vote
+  minReplicas: 1
+  maxReplicas: 10
+
+  metrics:
+  # CPU 기반 스케일링 (기존)
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 50  # 50% CPU 사용 시 스케일링
+
+  # http_requests_total 기반 스케일링 (커스텀 메트릭)
+  - type: Pods
+    pods:
+      metric:
+        name: http_requests_total
+      target:
+        type: AverageValue
+        averageValue: "5"  # 초당 5개 요청 초과시 스케일아웃
+
+  # current_sessions 기반 스케일링 (커스텀 메트릭)
+  - type: Pods
+    pods:
+      metric:
+        name: current_sessions
+      target:
+        type: AverageValue
+        averageValue: "50"  # 평균 50세션 초과시 스케일아웃
+
+  # http_request_duration_seconds_bucket 기반 스케일링 (커스텀 메트릭)
+  - type: Pods
+    pods:
+      metric:
+        name: http_request_duration_seconds_bucket
+      target:
+        type: AverageValue
+        averageValue: "0.3"  # 평균 응답시간 0.3초 초과시 스케일아웃
+

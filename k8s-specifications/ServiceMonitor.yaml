@@ -1,0 +1,18 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: vote-sm
+  labels:
+    release: prometheus     # <- Helm 릴리스 이름이랑 반드시 일치
+spec:
+  selector:
+    matchLabels:
+      app: vote
+  namespaceSelector:
+    matchNames:
+    - default
+  endpoints:
+  - port: http
+    path: /metrics
+    interval: 15s
+
